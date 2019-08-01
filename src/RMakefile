@@ -1,0 +1,84 @@
+CFLAGS=-I/usr/share/R/include -DNDEBUG  -I"/usr/local/lib/R/site-library/Rcpp/include" \
+ -Wall -Wextra -Wunused-variable -Wunused-local-typedefs -Wsign-compare -Wmaybe-uninitialized -Wvla \
+   -fopenmp -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g
+
+OBS= tree.o treefuns.o brt.o brtfuns.o mbrt.o sbrt.o ambrt.o psbrt.o cdotree.o cmbrt.o cpsambrt.o
+
+rbart.so: $(OBS) 
+	g++ -std=gnu++11 -shared -L/usr/lib/R/lib -Wl,-Bsymbolic-functions -Wl,-z,relro -o rbart.so $(OBS) -fopenmp -L/usr/lib/R/lib -lR
+
+cpsambrt.o: cpsambrt.cpp $(SRC)
+	g++ -std=gnu++11 $(CFLAGS) -c cpsambrt.cpp -o cpsambrt.o
+
+cmbrt.o: cmbrt.cpp
+	g++ -std=gnu++11 $(CFLAGS) -c cmbrt.cpp -o cmbrt.o
+
+cdotree.o: cdotree.cpp 
+	g++ -std=gnu++11 $(CFLAGS) -c cdotree.cpp -o cdotree.o
+
+psbrt.o: psbrt.h psbrt.cpp
+	g++ -std=gnu++11 $(CFLAGS) -c psbrt.cpp -o psbrt.o
+
+ambrt.o: ambrt.h ambrt.cpp
+	g++ -std=gnu++11 $(CFLAGS) -c ambrt.cpp -o ambrt.o
+
+sbrt.o: sbrt.h sbrt.cpp
+	g++ -std=gnu++11 $(CFLAGS) -c sbrt.cpp -o sbrt.o
+
+mbrt.o: mbrt.h mbrt.cpp
+	g++ -std=gnu++11 $(CFLAGS) -c mbrt.cpp -o mbrt.o
+
+brt.o: brt.h brt.cpp
+	g++ -std=gnu++11 $(CFLAGS) -c brt.cpp -o brt.o
+
+brtfuns.o: brtfuns.h brtfuns.cpp
+	g++ -std=gnu++11 $(CFLAGS) -c brtfuns.cpp -o brtfuns.o
+
+tree.o: tree.cpp tree.h rn.h rrn.h
+	g++ -std=gnu++11 $(CFLAGS) -c tree.cpp -o tree.o
+
+treefuns.o: treefuns.cpp treefuns.h
+	g++ -std=gnu++11 $(CFLAGS) -c treefuns.cpp -o treefuns.o
+
+init.o: init.c
+	gcc -std=gnu99 $(CFLAGS)  -c init.c -o init.o
+
+tree.h tree.cpp treefuns.cpp treefuns.h: 
+	cp ../../../tree/tree.h .
+	cp ../../../tree/tree.cpp .
+	cp ../../../tree/treefuns.h .
+	cp ../../../tree/treefuns.cpp .
+
+brt.cpp  brtfuns.cpp brt.h brtfuns.h dinfo.h:
+	cp ../../../brt/brt.cpp .
+	cp ../../../brt/brt.h .
+	cp ../../../brt/brtfuns.cpp .
+	cp ../../../brt/brtfuns.h .
+	cp ../../../brt/dinfo.h .
+
+ambrt.cpp ambrt.h:
+	cp ../../../ambrt/ambrt.cpp .
+	cp ../../../ambrt/ambrt.h .
+
+sbrt.cpp sbrt.h:
+	cp ../../../sbrt/sbrt.cpp .
+	cp ../../../sbrt/sbrt.h .
+
+mbrt.cpp mbrt.h:
+	cp ../../../mbrt/mbrt.cpp .
+	cp ../../../mbrt/mbrt.h .
+
+psbrt.cpp psbrt.h:
+	cp ../../../psbrt/psbrt.cpp .
+	cp ../../../psbrt/psbrt.h .
+
+clean:
+	rm -f *.o
+	rm -f rbart.so
+	rm -f mbrt.h mbrt.cpp
+	rm -f brt.h brt.cpp brtfuns.h brtfuns.cpp dinfo.h
+	rm -f tree.h tree.cpp treefuns.cpp treefuns.h
+	rm -f sbrt.h sbrt.cpp
+	rm -f ambrt.h ambrt.cpp
+	rm -f psbrt.h psbrt.cpp
+
